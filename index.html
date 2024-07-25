@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pizza Cart API</title>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    x-data="{
+    title: 'Pizza Cart API',
+    pizzas: [],
+    cart: [],
+    addToCart(pizza) {
+        const item = this.cart.find(c => c.id === pizza.id);
+        if (item) {
+            item.quantity += 1;
+            item.total = item.quantity * item.price;
+        } else {
+            this.cart.push({
+                id: pizza.id,
+                flavour: pizza.flavour,
+                size: pizza.size,
+                price: pizza.price,
+                quantity: 1,
+                total: pizza.price
+            });
+        }
+    },
+    removeFromCart(index) {
+        this.cart.splice(index, 1);
+    },
+    getTotal() {
+        return this.cart.reduce((sum, item) => sum + item.total, 0).toFixed(2);
+    },
+    checkout() {
+        if (this.cart.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+        alert('Proceeding to checkout!');
+    },
+    payNow() {
+        if (this.cart.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+        alert('Payment successful! Thank you for your purchase.');
+        this.cart = [];
+    }
+}"
+    x-init="axios.get('https://pizza-api.projectcodex.net/api/pizzas')
+        .then(result => {
+            pizzas = result.data.pizzas;
+        })">
+    <h1 x-text="title"></h1>
+
+    <div class="pizza-list">
+      <template x-for="pizza in pizzas" :key="pizza.id">
+        <div class="pizza">
+          <h5 x-text="pizza.flavour"></h5>
+          <span x-text="'Size: ' + pizza.size"></span>
+          <span x-text="'Price: R' + pizza.price.toFixed(2)"></span>
+          <button @click="addToCart(pizza)" class="add-to-cart-btn">
+            Add to Cart
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="cart">
+      <h2>Cart</h2>
+      <template x-for="(item, index) in cart" :key="item.id">
+        <div class="cart-item">
+          <span x-text="item.flavour + ' (' + item.size + ')'"></span>
+          <span x-text="'R' + item.price.toFixed(2)"></span>
+          <input
+            type="number"
+            x-model="item.quantity"
+            @input="item.total = item.price * item.quantity"
+            min="1"
+            class="quantity-input" />
+          <span x-text="'R' + item.total.toFixed(2)"></span>
+          <button @click="removeFromCart(index)" class="remove-btn">
+            Remove
+          </button>
+        </div>
+      </template>
+      <div class="cart-total">
+        <span>Total: R<span x-text="getTotal()"></span></span>
+      </div>
+      <button @click="checkout" class="checkout-btn">Checkout</button>
+      <button @click="payNow" class="pay-now-btn">Pay Now</button>
+    </div>
+  </body>
+</html>
