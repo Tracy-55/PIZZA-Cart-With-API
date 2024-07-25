@@ -62,6 +62,7 @@
     <div class="pizza-list">
       <template x-for="pizza in pizzas" :key="pizza.id">
         <div class="pizza">
+            <img src="Images/pizzza.jpg" alt="Pizza Image" class="pizza-image">
           <h5 x-text="pizza.flavour"></h5>
           <span x-text="'Size: ' + pizza.size"></span>
           <span x-text="'Price: R' + pizza.price.toFixed(2)"></span>
@@ -73,6 +74,15 @@
     </div>
 
     <div class="cart">
+        <div>
+            username: <input type="text" x-model="USERNAME">
+            <button x-on:click="LOGIN" x-show="username && !cartId">LOGIN</button>
+             <button x-on:click="LOGOUT" x-show="username && !cartId">LOGOUT</button>
+        </div>
+        <div x-show="cartId"
+        Cart code: <span x-text="cartId"></span>
+        
+    </div>
       <h2>Cart</h2>
       <template x-for="(item, index) in cart" :key="item.id">
         <div class="cart-item">
