@@ -12,47 +12,63 @@
   </head>
   <body
     x-data="{
-    title: 'Pizza Cart API',
-    pizzas: [],
-    cart: [],
-    addToCart(pizza) {
-        const item = this.cart.find(c => c.id === pizza.id);
-        if (item) {
-            item.quantity += 1;
-            item.total = item.quantity * item.price;
-        } else {
-            this.cart.push({
-                id: pizza.id,
-                flavour: pizza.flavour,
-                size: pizza.size,
-                price: pizza.price,
-                quantity: 1,
-                total: pizza.price
-            });
-        }
-    },
-    removeFromCart(index) {
-        this.cart.splice(index, 1);
-    },
-    getTotal() {
-        return this.cart.reduce((sum, item) => sum + item.total, 0).toFixed(2);
-    },
-    checkout() {
-        if (this.cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        alert('Proceeding to checkout!');
-    },
-    payNow() {
-        if (this.cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        alert('Payment successful! Thank you for your purchase.');
-        this.cart = [];
-    }
-}"
+      title: 'Pizza Cart API',
+      pizzas: [],
+      cart: [],
+      username: '',
+      cartId: null,
+      isLoggedIn: false,
+      addToCart(pizza) {
+          const item = this.cart.find(c => c.id === pizza.id);
+          if (item) {
+              item.quantity += 1;
+              item.total = item.quantity * item.price;
+          } else {
+              this.cart.push({
+                  id: pizza.id,
+                  flavour: pizza.flavour,
+                  size: pizza.size,
+                  price: pizza.price,
+                  quantity: 1,
+                  total: pizza.price
+              });
+          }
+      },
+      removeFromCart(index) {
+          this.cart.splice(index, 1);
+      },
+      getTotal() {
+          return this.cart.reduce((sum, item) => sum + item.total, 0).toFixed(2);
+      },
+      checkout() {
+          if (this.cart.length === 0) {
+              alert('Your cart is empty!');
+              return;
+          }
+          alert('Proceeding to checkout!');
+      },
+      payNow() {
+          if (this.cart.length === 0) {
+              alert('Your cart is empty!');
+              return;
+          }
+          alert('Payment successful! Thank you for your purchase.');
+          this.cart = [];
+      },
+      LOGIN() {
+          if (this.username) {
+              this.isLoggedIn = true;
+              this.cartId = 'Cart-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+          } else {
+              alert('Please enter a username.');
+          }
+      },
+      LOGOUT() {
+          this.isLoggedIn = false;
+          this.cartId = null;
+          this.username = '';
+      }
+    }"
     x-init="axios.get('https://pizza-api.projectcodex.net/api/pizzas')
         .then(result => {
             pizzas = result.data.pizzas;
@@ -62,7 +78,7 @@
     <div class="pizza-list">
       <template x-for="pizza in pizzas" :key="pizza.id">
         <div class="pizza">
-            <img src="Images/pizzza.jpg" alt="Pizza Image" class="pizza-image">
+          <img src="Images/pizzza.jpg" alt="Pizza Image" class="pizza-image" />
           <h5 x-text="pizza.flavour"></h5>
           <span x-text="'Size: ' + pizza.size"></span>
           <span x-text="'Price: R' + pizza.price.toFixed(2)"></span>
@@ -74,15 +90,12 @@
     </div>
 
     <div class="cart">
-        <div>
-            username: <input type="text" x-model="USERNAME">
-            <button x-on:click="LOGIN" x-show="username && !cartId">LOGIN</button>
-             <button x-on:click="LOGOUT" x-show="username && !cartId">LOGOUT</button>
-        </div>
-        <div x-show="cartId"
-        Cart code: <span x-text="cartId"></span>
-        
-    </div>
+      <div>
+        <input type="text" x-model="username" placeholder="Enter username" />
+        <button x-on:click="LOGIN" x-show="!isLoggedIn">LOGIN</button>
+        <button x-on:click="LOGOUT" x-show="isLoggedIn">LOGOUT</button>
+      </div>
+      <div x-show="isLoggedIn">Cart code: <span x-text="cartId"></span></div>
       <h2>Cart</h2>
       <template x-for="(item, index) in cart" :key="item.id">
         <div class="cart-item">
